@@ -7,4 +7,10 @@ import (
 )
 
 func main() {
+	giftShop, err := puzzles.GiftShop()
+	if err != nil {
+		panic("error!")
+	}
+
+	fmt.Println(giftShop)
 }
