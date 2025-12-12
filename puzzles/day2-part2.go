@@ -11,11 +11,55 @@ import (
 	"strings"
 )
 
-func checkRepeats(leftId int, rightId int) (repeats int) {
+func checkDouble(id string) (value bool, err error) {
+	length := len(id)
+	if length == 0 {
+		return false, err
+	}
+
+	// Iterate through possible pattern lengths.
+	// A pattern can be at most half the length of the string.
+	for i := 1; i <= length/2; i++ {
+		// If the string length is not divisible by the current pattern length,
+		// it cannot be a repetition of this pattern.
+		if length%i != 0 {
+			continue
+		}
+
+		// Extract the potential pattern.
+		pattern := id[:i]
+
+		// Construct the expected repeated string.
+		// Use strings.Repeat to efficiently create the repeated string.
+		repeated := strings.Repeat(pattern, length/i)
+
+		// Compare the original string with the constructed repeated string.
+		if id == repeated {
+			return true, err
+		}
+	}
+
+	return false, err // No repeating pattern found.
+}
+
+func checkRepeatsPartTwo(leftId int, rightId int) (repeats int) {
 	// 105 106... .. 110, 111
 	var count int = 0
 	for i := leftId; i <= rightId; i++ {
 		id := strconv.Itoa(i)
+		isRepeated, err := checkDouble(id)
+		if err != nil {
+			panic("error calling checkDouble")
+		}
+		if isRepeated {
+			tempId, err := strconv.Atoi(id)
+			if err != nil {
+				panic("error1")
+			}
+			count += tempId
+			continue
+		}
+
 		length := len(id)
 		if length%2 != 0 {
 			continue
@@ -34,7 +78,7 @@ func checkRepeats(leftId int, rightId int) (repeats int) {
 	return count
 }
 
-func GiftShop() (invalidIds int, err error) {
+func GiftShopPartTwo() (invalidIds int, err error) {
 	data, err := os.ReadFile("public/day2Input.txt")
 	if err != nil {
 		panic("error reading the file")
@@ -59,13 +103,13 @@ func GiftShop() (invalidIds int, err error) {
 			panic("error converting right side into int")
 		}
 		//		fmt.Printf("%d <- Left | right -> %d\n", leftId, rightId)
-		count := checkRepeats(leftId, rightId)
+		count := checkRepeatsPartTwo(leftId, rightId)
 		totalSum += count
 	}
 
-	testCase := checkRepeats(11, 22)
 	fmt.Printf("Sum of all repeats: %d\n", totalSum)
-	fmt.Printf("another smaller test case: %d\n ", testCase)
+	checkDoubleTest, err := checkDouble("23123123")
+	fmt.Println(checkDoubleTest)
 	return 0, err
 }
 
